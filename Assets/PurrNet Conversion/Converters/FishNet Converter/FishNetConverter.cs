@@ -31,7 +31,8 @@ namespace PurrNet.ConversionTool
             { "Multipass", "CompositeTransport"},
             { "Tugboat", "UDPTransport"},
             { "Yak", "LocalTransport"},
-            { "FishySteamworks", "SteamTransport"}
+            { "FishySteamworks", "SteamTransport"},
+            { "NetworkObject", "NetworkIdentity"},
         };
         
         private Dictionary<string, string> propertyMappings = new Dictionary<string, string>
@@ -42,7 +43,9 @@ namespace PurrNet.ConversionTool
             { "IsClient", "isClient" },
             { "IsClientInitialized", "isClient" },
             { "OnStartClientCalled", "isSpawned"},
-            { "OnStartServerCalled", "isSpawned"}
+            { "OnStartServerCalled", "isSpawned"},
+            { "OwnerId", "owner" },
+            { "Owner", "owner" },
         };
         
         private Dictionary<string, string> methodMappings = new Dictionary<string, string>
@@ -57,6 +60,17 @@ namespace PurrNet.ConversionTool
         {
             { "InstanceFinder", "InstanceHandler" },
             { "ClientId", "id" }
+        };
+        
+        private Dictionary<string, string> methodCallMappings = new Dictionary<string, string>
+        {
+            { "StartConnection(true)", "StartServer()" },
+            { "StartConnection(false)", "StartClient()" }
+        };
+        
+        private Dictionary<string, string> typeNamespaceRequirements = new Dictionary<string, string>
+        {
+            { "SteamTransport", "PurrNet.Steam" }
         };
 
         public override ConversionResult ConvertFullProject()
@@ -90,6 +104,7 @@ namespace PurrNet.ConversionTool
             result.ConversionStats["properties converted"] = 0;
             result.ConversionStats["methods converted"] = 0;
             result.ConversionStats["members converted"] = 0;
+            result.ConversionStats["method calls converted"] = 0;
             
             try
             {
@@ -134,18 +149,14 @@ namespace PurrNet.ConversionTool
         {
             string code = File.ReadAllText(filePath);
             
-            // Skip files that don't contain FishNet references to avoid unnecessary processing
             if (!code.Contains("FishNet") && !ContainsAnyTargetPattern(code))
             {
                 return;
             }
             
-            Debug.Log($"Handling file: {filePath}");
-            // Parse the code
             SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
             
-            // Apply transformations
             root = (CompilationUnitSyntax)ConvertNamespaces(root, result);
             root = (CompilationUnitSyntax)ConvertTypes(root, result);
             root = (CompilationUnitSyntax)ConvertProperties(root, result);
@@ -154,15 +165,14 @@ namespace PurrNet.ConversionTool
             root = (CompilationUnitSyntax)ConvertMembers(root, result);
             root = (CompilationUnitSyntax)ConvertSpecialCases(root, result);
             root = (CompilationUnitSyntax)ConvertUsingDirectives(root, result);
+            root = (CompilationUnitSyntax)ConvertMethodCalls(root, result);
             root = (CompilationUnitSyntax)ConvertNamespaces(root, result);
             
-            // Save the converted code
             File.WriteAllText(filePath, root.NormalizeWhitespace().ToFullString());
         }
         
         private bool ContainsAnyTargetPattern(string code)
         {
-            // Check if code contains any of the patterns we want to convert
             foreach (var mapping in propertyMappings)
             {
                 if (code.Contains(mapping.Key))
@@ -347,6 +357,47 @@ namespace PurrNet.ConversionTool
             
             return node;
         }
+        
+        private SyntaxNode ConvertMethodCalls(SyntaxNode node, ConversionResult result)
+        {
+            return node.ReplaceNodes(
+                node.DescendantNodes().OfType<InvocationExpressionSyntax>(),
+                (original, rewritten) =>
+                {
+                    if (original.Expression is MemberAccessExpressionSyntax memberAccess)
+                    {
+                        var methodName = memberAccess.Name.Identifier.Text;
+                
+                        // Handle method calls with arguments
+                        if (methodName == "StartConnection" && original.ArgumentList.Arguments.Count == 1)
+                        {
+                            var argument = original.ArgumentList.Arguments[0].Expression;
+                    
+                            if (argument is LiteralExpressionSyntax literal)
+                            {
+                                string patternKey = $"{methodName}({literal.Token.ValueText})";
+                        
+                                if (methodCallMappings.TryGetValue(patternKey, out string newMethodName))
+                                {
+                                    var newMethodAccess = SyntaxFactory.MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        memberAccess.Expression,
+                                        SyntaxFactory.IdentifierName(newMethodName));
+                                
+                                    var newInvocation = SyntaxFactory.InvocationExpression(
+                                        newMethodAccess,
+                                        SyntaxFactory.ArgumentList());
+                                
+                                    result.ConversionStats["method calls converted"]++;
+                                    return newInvocation;
+                                }
+                            }
+                        }
+                    }
+            
+                    return rewritten;
+                });
+        }
 
         private SyntaxNode MethodsSecondPass(SyntaxNode node, ConversionResult result)
         {
@@ -378,7 +429,6 @@ namespace PurrNet.ConversionTool
                     
                     if (memberMappings.TryGetValue(memberName, out string newMember))
                     {
-                        // For member access expressions (e.g., InstanceFinder.something or conn.ClientId)
                         if (original.Parent is MemberAccessExpressionSyntax)
                         {
                             result.ConversionStats["members converted"]++;
@@ -392,7 +442,6 @@ namespace PurrNet.ConversionTool
         
         private SyntaxNode ConvertSpecialCases(SyntaxNode node, ConversionResult result)
         {
-            // Handle NetworkManager parameter -> networkManager
             node = node.ReplaceNodes(
                 node.DescendantNodes().OfType<ParameterSyntax>(),
                 (original, rewritten) =>
@@ -405,7 +454,6 @@ namespace PurrNet.ConversionTool
                     return rewritten;
                 });
             
-            // Handle conn.ClientId -> player.id conversion
             node = node.ReplaceNodes(
                 node.DescendantNodes().OfType<MemberAccessExpressionSyntax>(),
                 (original, rewritten) =>
@@ -430,59 +478,66 @@ namespace PurrNet.ConversionTool
         {
             if (!(node is CompilationUnitSyntax compilationUnit))
                 return node;
-        
+
             var usingDirectives = compilationUnit.Usings.ToList();
-    
             bool hasFishNetUsing = false;
             bool hasFishNetTransportingUsing = false;
-    
+            
+            HashSet<string> requiredNamespaces = new HashSet<string>();
+            
+            foreach (var type in node.DescendantNodes().OfType<IdentifierNameSyntax>())
+            {
+                var typeName = type.Identifier.Text;
+                if (typeNamespaceRequirements.TryGetValue(typeName, out string requiredNamespace))
+                {
+                    requiredNamespaces.Add(requiredNamespace);
+                }
+            }
+
             var newUsings = new List<UsingDirectiveSyntax>();
-    
+
             foreach (var usingDirective in usingDirectives)
             {
                 var namespaceName = usingDirective.Name.ToString();
-        
+            
                 if (namespaceName.StartsWith("FishNet"))
                 {
                     hasFishNetUsing = true;
                     result.ConversionStats["namespaces converted"]++;
-            
+                
                     if (namespaceName == "FishNet.Transporting")
                     {
                         hasFishNetTransportingUsing = true;
                     }
-            
-                    // Skip this directive, don't add to newUsings
                 }
                 else
                 {
-                    // Keep non-FishNet using directives
                     newUsings.Add(usingDirective);
                 }
             }
-    
-            // Add PurrNet replacements
+
             if (hasFishNetUsing)
             {
                 newUsings.Add(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("PurrNet")));
-        
+            
                 if (hasFishNetTransportingUsing)
                 {
                     newUsings.Add(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("PurrNet.Transports")));
                 }
+                
+                foreach (var requiredNamespace in requiredNamespaces)
+                {
+                    newUsings.Add(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(requiredNamespace)));
+                }
             }
-    
-            // Replace all usings with our filtered and augmented list
+
             return compilationUnit.WithUsings(SyntaxFactory.List(newUsings));
         }
         
         public override ConversionResult ConvertPrefabs()
         {
-            // This would contain prefab conversion logic - for now we'll return a basic result
             var result = new ConversionResult();
             result.ConversionStats["prefabs processed"] = 0;
-            
-            // This should be implemented based on your prefab conversion needs
             
             return result;
         }

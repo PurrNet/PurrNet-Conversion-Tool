@@ -13,7 +13,7 @@ namespace PurrNet.ConversionTool
         private Vector2 scrollPosition;
         private Vector2 foldersScrollPosition;
 
-        private Dictionary<string, NetworkSystemConverter> converters = new Dictionary<string, NetworkSystemConverter>();
+        private Dictionary<string, GenericNetworkConverter> converters = new Dictionary<string, GenericNetworkConverter>();
         
         // Folder paths
         private List<DefaultAsset> scriptFolderAssets = new List<DefaultAsset>();
@@ -110,11 +110,12 @@ namespace PurrNet.ConversionTool
                 }
             }
 
-            // Register converters
-            converters.Add("FishNet", new FishNetConverter());
-            // converters.Add("Photon PUN", new PhotonPunConverter());
-            // converters.Add("Mirror", new MirrorConverter());
-            // converters.Add("Unity Netcode", new NetcodeConverter());
+            // Register converters using the new GenericNetworkConverter with system-specific mappings
+            converters.Add("FishNet", new GenericNetworkConverter(new FishNetMappings()));
+            // Add more converters as needed:
+            // converters.Add("Photon PUN", new GenericNetworkConverter(new PhotonPunMappings()));
+            // converters.Add("Mirror", new GenericNetworkConverter(new MirrorMappings()));
+            // converters.Add("Unity Netcode", new GenericNetworkConverter(new NetcodeMappings()));
         }
 
         private void OnGUI()
