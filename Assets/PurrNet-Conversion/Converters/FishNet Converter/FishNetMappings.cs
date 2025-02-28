@@ -81,14 +81,38 @@ namespace PurrNet.ConversionTool
             {
                 { "conn.ClientId", ("player", "id") }
             };
+            
+            TargetTypeDefaultMappings = new Dictionary<string, string>
+            {
+                { "PlayerID:null", "default" }
+            };
+            
+            AttributeMappings = new Dictionary<string, string> { };
+            AttributeParameterMappings = new Dictionary<string, string>
+            {
+                {"BufferLast", "bufferLast"},
+                {"RequireOwnership", "requireOwnership"},
+                {"ExcludeOwner", "excludeOwner"},
+                {"ExcludeServer", "excludeSender"},
+                {"RunLocally", "runLocally"},
+            };
+            
+            TypeSpecificMemberMappings = new Dictionary<string, Dictionary<string, string>>
+            {
+                { "SyncVar", new Dictionary<string, string> 
+                    {
+                        { "Value", "value" },
+                        {"OnChange", "onChanged"},
+                        {"DirtyAll", "FlushImmediately"}
+                    }
+                },
+            };
         }
         
         public override SyntaxNode SpecialCaseHandler(SyntaxNode node, ConversionResult result)
         {
-            // Handle FishNet's special OnStart/OnStop server/client method conversion
             Dictionary<string, List<MethodDeclarationSyntax>> convertedMethodsMap = new Dictionary<string, List<MethodDeclarationSyntax>>();
             
-            // Group OnStart/OnStop methods by their target method name
             foreach (var method in node.DescendantNodes().OfType<MethodDeclarationSyntax>())
             {
                 var methodName = method.Identifier.Text;

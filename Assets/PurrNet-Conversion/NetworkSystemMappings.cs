@@ -17,6 +17,15 @@ namespace PurrNet.ConversionTool
         public Dictionary<string, string> MemberMappings { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, string> MethodCallMappings { get; set; } = new Dictionary<string, string>();
         
+        // default parameter values of methods. Like null should be default, etc.
+        public Dictionary<string, string> TargetTypeDefaultMappings { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, Dictionary<string, string>> TypeSpecificMemberMappings { get; set; } = new Dictionary<string, Dictionary<string, string>>();
+
+        
+        // Attribute Mappings
+        public Dictionary<string, string> AttributeMappings { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> AttributeParameterMappings { get; set; } = new Dictionary<string, string>();
+        
         // Special cases mappings
         public Dictionary<string, string> TypeNamespaceRequirements { get; set; } = new Dictionary<string, string>();
         public Dictionary<string, string> ParameterMappings { get; set; } = new Dictionary<string, string>();

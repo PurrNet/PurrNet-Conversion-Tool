@@ -91,7 +91,6 @@ namespace PurrNet.ConversionTool
                 prefabFolderAssets.Add(null);
             };
             
-            // Initialize with default folder if empty
             if (scriptFolderAssets.Count == 0)
             {
                 DefaultAsset assetsFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets");
@@ -111,7 +110,7 @@ namespace PurrNet.ConversionTool
             }
 
             // Register converters using the new GenericNetworkConverter with system-specific mappings
-            converters.Add("FishNet", new GenericNetworkConverter(new FishNetMappings()));
+            converters.Add("FishNet", new GenericNetworkConverter(new FishNetMappings(), new FishNetPrefabHandling()));
             // Add more converters as needed:
             // converters.Add("Photon PUN", new GenericNetworkConverter(new PhotonPunMappings()));
             // converters.Add("Mirror", new GenericNetworkConverter(new MirrorMappings()));
@@ -127,13 +126,11 @@ namespace PurrNet.ConversionTool
 
             EditorGUILayout.Space(10);
             
-            // Folder selection section
             GUILayout.Label("Conversion Scope:", EditorStyles.boldLabel);
             
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             foldersScrollPosition = EditorGUILayout.BeginScrollView(foldersScrollPosition, GUILayout.Height(200));
             
-            // Script folders section
             showScriptFolders = EditorGUILayout.Foldout(showScriptFolders, "Script Folders", true);
             if (showScriptFolders)
             {
@@ -142,7 +139,6 @@ namespace PurrNet.ConversionTool
             
             EditorGUILayout.Space(5);
             
-            // Prefab folders section
             showPrefabFolders = EditorGUILayout.Foldout(showPrefabFolders, "Prefab Folders", true);
             if (showPrefabFolders)
             {
@@ -180,7 +176,7 @@ namespace PurrNet.ConversionTool
             GUILayout.Label("Conversion Log:", EditorStyles.boldLabel);
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(150));
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(200));
 
             EditorGUILayout.SelectableLabel(conversionLog, EditorStyles.textArea, GUILayout.ExpandHeight(true));
 
@@ -204,7 +200,6 @@ namespace PurrNet.ConversionTool
             {
                 var converter = converters[selectedSystem];
                 
-                // Set folders for the converter
                 if (converter is IFolderAwareConverter folderAwareConverter)
                 {
                     folderAwareConverter.ScriptFolders = GetAssetPaths(scriptFolderAssets);
@@ -234,7 +229,6 @@ namespace PurrNet.ConversionTool
             {
                 var converter = converters[selectedSystem];
                 
-                // Set folders for the converter
                 if (converter is IFolderAwareConverter folderAwareConverter)
                 {
                     folderAwareConverter.PrefabFolders = GetAssetPaths(prefabFolderAssets);
@@ -263,7 +257,6 @@ namespace PurrNet.ConversionTool
             {
                 var converter = converters[selectedSystem];
                 
-                // Set folders for the converter
                 if (converter is IFolderAwareConverter folderAwareConverter)
                 {
                     folderAwareConverter.ScriptFolders = GetAssetPaths(scriptFolderAssets);
@@ -278,7 +271,6 @@ namespace PurrNet.ConversionTool
             }
         }
         
-        // Helper method to convert DefaultAsset list to string paths list
         private List<string> GetAssetPaths(List<DefaultAsset> assets)
         {
             List<string> paths = new List<string>();
@@ -295,7 +287,6 @@ namespace PurrNet.ConversionTool
                 }
             }
             
-            // If no valid folders, use Assets as default
             if (paths.Count == 0)
             {
                 paths.Add("Assets");
