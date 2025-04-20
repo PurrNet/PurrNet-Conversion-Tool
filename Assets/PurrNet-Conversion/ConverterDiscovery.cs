@@ -9,17 +9,9 @@ namespace PurrNet.ConversionTool
     {
         public class ConverterInfo
         {
-            public string Name
-            {
-                get;
-                set;
-            }
+            public string Name { get; set; }
 
-            public GenericNetworkConverter Converter
-            {
-                get;
-                set;
-            }
+            public GenericNetworkConverter Converter { get; set; }
         }
 
         public static List<ConverterInfo> DiscoverConverters()

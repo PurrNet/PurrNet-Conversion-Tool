@@ -5,25 +5,14 @@ namespace PurrNet.ConversionTool
 {
     public interface IFolderAwareConverter
     {
-        List<string> ScriptFolders
-        {
-            get;
-            set;
-        }
+        List<string> ScriptFolders { get; set; }
 
-        List<string> PrefabFolders
-        {
-            get;
-            set;
-        }
+        List<string> PrefabFolders { get; set; }
     }
 
     public abstract class NetworkSystemConverter
     {
-        public abstract string SystemName
-        {
-            get;
-        }
+        public abstract string SystemName { get; }
 
         public virtual ConversionResult ConvertFullProject()
         {
@@ -43,28 +32,14 @@ namespace PurrNet.ConversionTool
 
     public class ConversionResult
     {
-        public bool Success
-        {
-            get;
-            set;
-        }
-
-        = true;
-        public string ErrorMessage
-        {
-            get;
-            set;
-        }
-
-        = string.Empty;
-        public Dictionary<string, int> ConversionStats
-        {
-            get;
-            set;
-        }
-
-        = new Dictionary<string, int>();
+        public bool Success { get; set; } = true;
+        
+        public string ErrorMessage { get; set; } = string.Empty;
+        
+        public Dictionary<string, int> ConversionStats { get; set; } = new Dictionary<string, int>();
+        
         private static Vector2 scrollPosition;
+        
         public override string ToString()
         {
             if (!Success)

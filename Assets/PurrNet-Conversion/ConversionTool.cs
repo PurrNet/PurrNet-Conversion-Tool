@@ -14,20 +14,10 @@ namespace PurrNet.ConversionTool
     {
         private NetworkSystemMappings mappings;
         private NetworkPrefabHandling prefabHandler;
-        public List<string> ScriptFolders
-        {
-            get;
-            set;
-        }
-
-        = new List<string>();
-        public List<string> PrefabFolders
-        {
-            get;
-            set;
-        }
-
-        = new List<string>();
+        public List<string> ScriptFolders { get; set; } = new List<string>();
+        
+        public List<string> PrefabFolders { get; set; } = new List<string>();
+        
         public GenericNetworkConverter(NetworkSystemMappings mappings, NetworkPrefabHandling prefabHandler)
         {
             this.mappings = mappings;
