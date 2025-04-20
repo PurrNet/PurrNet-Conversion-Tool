@@ -234,19 +234,37 @@ namespace PurrNet.ConversionTool
 
         protected SyntaxNode ConvertTypes(SyntaxNode node, ConversionResult result)
         {
-            return node.ReplaceNodes(node.DescendantNodes().OfType<IdentifierNameSyntax>(), (original, rewritten) =>
-            {
-                var typeName = original.Identifier.Text;
-                if (mappings.TypeMappings.TryGetValue(typeName, out string newType))
+            node = node.ReplaceNodes(
+                node.DescendantNodes().OfType<IdentifierNameSyntax>(),
+                (original, rewritten) =>
                 {
-                    result.ConversionStats["types converted"]++;
-                    return SyntaxFactory.IdentifierName(newType);
-                }
-
-                return rewritten;
-            }
-
-            );
+                    var typeName = original.Identifier.Text;
+                    
+                    if (mappings.TypeMappings.TryGetValue(typeName, out string newType))
+                    {
+                        result.ConversionStats["types converted"]++;
+                        return SyntaxFactory.IdentifierName(newType);
+                    }
+                    
+                    return rewritten;
+                });
+                
+            node = node.ReplaceNodes(
+                node.DescendantNodes().OfType<PredefinedTypeSyntax>(),
+                (original, rewritten) =>
+                {
+                    var keyword = original.Keyword.ValueText;
+                    
+                    if (mappings.TypeMappings.TryGetValue(keyword, out string newType))
+                    {
+                        result.ConversionStats["types converted"]++;
+                        return SyntaxFactory.IdentifierName(newType);
+                    }
+                    
+                    return rewritten;
+                });
+                
+            return node;
         }
 
         protected SyntaxNode ConvertProperties(SyntaxNode node, ConversionResult result)

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    private string _testString = "Test String";
+    private ushort _testString = 33;
     void Update()
     {
         if (NetworkManager.main)

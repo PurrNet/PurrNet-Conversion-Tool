@@ -7,6 +7,8 @@ public class TestCodeMappings : NetworkSystemMappings
     public TestCodeMappings()
     {
         SystemName = "Test";
-        PropertyMappings = new Dictionary<string, string>{{"string", "ulong"}, };
+        TypeMappings = new Dictionary<string, string>{
+            {"int", "ushort"}
+        };
     }
 }
