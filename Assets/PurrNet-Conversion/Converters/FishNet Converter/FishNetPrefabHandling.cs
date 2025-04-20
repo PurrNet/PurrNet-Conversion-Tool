@@ -7,7 +7,6 @@ using FishNet.Component.Animating;
 using FishNet.Component.Transforming;
 using FishNet.Object;
 #endif
-
 public class FishNetPrefabHandling : NetworkPrefabHandling
 {
 #if FISHNET
