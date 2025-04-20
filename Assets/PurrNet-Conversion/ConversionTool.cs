@@ -126,6 +126,18 @@ namespace PurrNet.ConversionTool
             root = (CompilationUnitSyntax)mappings.SpecialCaseHandler(root, result);
             root = (CompilationUnitSyntax)ConvertUsingDirectives(root, result, requiredNamespaces);
             File.WriteAllText(filePath, root.NormalizeWhitespace().ToFullString());
+            
+            if (!code.Equals(root.NormalizeWhitespace().ToFullString()))
+            {
+                List<string> changes = result.ConversionStats
+                    .Where(kvp => kvp.Value > 0)
+                    .Select(kvp => $"{kvp.Value} {kvp.Key}")
+                    .ToList();
+
+                string summary = string.Join(", ", changes);
+                ConversionLogger.LogChange($"Modified: {Path.GetFileName(filePath)} ({summary})");
+            }
+
         }
 
         protected virtual bool ContainsSystemIdentifiers(string code)
