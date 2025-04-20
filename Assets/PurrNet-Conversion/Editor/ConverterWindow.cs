@@ -198,7 +198,7 @@ namespace PurrNet.ConversionTool
             GUILayout.Label("Conversion Log:", EditorStyles.boldLabel);
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(200));
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(300));
 
             EditorGUILayout.SelectableLabel(conversionLog, EditorStyles.textArea, GUILayout.ExpandHeight(true));
 
