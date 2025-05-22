@@ -8,6 +8,7 @@ using FishNet.Object;
 using FishNet.Component;
 using FishNet.Managing.Client;
 using FishNet.Managing.Debugging;
+using FishNet.Managing.Observing;
 using FishNet.Managing.Predicting;
 using FishNet.Managing.Scened;
 using FishNet.Managing.Server;
@@ -93,6 +94,15 @@ namespace PurrNet.ConversionTool
             
             if(nm.TryGetComponent(out PredictionManager pm))
                 componentsToDelete.Add(pm);
+            
+            if(nm.TryGetComponent(out ObserverManager om))
+                componentsToDelete.Add(om);
+
+            if (nm.TryGetComponent(out FishNet.Component.Spawning.PlayerSpawner ps))
+            {
+                componentsToDelete.Add(ps);
+                var purrPs = nm.gameObject.AddComponent<PlayerSpawner>();
+            }
 
             if (nm.TryGetComponent(out FishNet.Managing.Statistic.StatisticsManager stats))
             {
