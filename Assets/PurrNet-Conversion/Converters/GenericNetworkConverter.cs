@@ -6,6 +6,7 @@ namespace PurrNet.ConversionTool
     {
         List<string> ScriptFolders { get; set; }
         List<string> PrefabFolders { get; set; }
+        List<string> SceneFolders { get; set; }
     }
     
     public class ConversionResult

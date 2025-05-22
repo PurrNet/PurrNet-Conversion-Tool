@@ -18,15 +18,18 @@ namespace PurrNet.ConversionTool
 
         private List<DefaultAsset> scriptFolderAssets = new List<DefaultAsset>();
         private List<DefaultAsset> prefabFolderAssets = new List<DefaultAsset>();
+        private List<DefaultAsset> sceneFolderAssets = new List<DefaultAsset>();
         
         private SerializedObject serializedObject;
         private ReorderableList scriptFoldersList;
         private ReorderableList prefabFoldersList;
+        private ReorderableList sceneFoldersList;
         
         private bool showScriptFolders = true;
         private bool showPrefabFolders = true;
+        private bool showSceneFolders = true;
 
-        [MenuItem("PurrNet/Conversion Tool")]
+        [MenuItem("Tools/PurrNet/Conversion Tool")]
         public static void ShowWindow()
         {
             GetWindow<ConverterWindow>("PurrNet Converter");
@@ -97,6 +100,23 @@ namespace PurrNet.ConversionTool
                     prefabFolderAssets.Add(assetsFolder);
                 }
             }
+            
+            sceneFoldersList = new ReorderableList(sceneFolderAssets, typeof(DefaultAsset), true, true, true, true);
+            sceneFoldersList.drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Scene Folders");
+            sceneFoldersList.drawElementCallback = (rect, index, _, _) =>
+            {
+                rect.y += 2;
+                rect.height = EditorGUIUtility.singleLineHeight;
+                sceneFolderAssets[index] = (DefaultAsset)EditorGUI.ObjectField(rect, sceneFolderAssets[index], typeof(DefaultAsset), false);
+            };
+            sceneFoldersList.onAddCallback = list => sceneFolderAssets.Add(null);
+
+            if (sceneFolderAssets.Count == 0)
+            {
+                DefaultAsset assetsFolder = AssetDatabase.LoadAssetAtPath<DefaultAsset>("Assets");
+                if (assetsFolder != null)
+                    sceneFolderAssets.Add(assetsFolder);
+            }
 
             RefreshConverters();
         }
@@ -163,6 +183,12 @@ namespace PurrNet.ConversionTool
                 prefabFoldersList.DoLayoutList();
             }
             
+            showSceneFolders = EditorGUILayout.Foldout(showSceneFolders, "Scene Folders", true);
+            if (showSceneFolders)
+            {
+                sceneFoldersList.DoLayoutList();
+            }
+            
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
             
@@ -188,6 +214,11 @@ namespace PurrNet.ConversionTool
             if (GUILayout.Button("Convert Code", GUILayout.Height(30)))
             {
                 ConvertCode();
+            }
+            
+            if (GUILayout.Button("Convert Scenes", GUILayout.Height(30)))
+            {
+                ConvertScenes();
             }
 
             EditorGUILayout.EndHorizontal();
@@ -235,6 +266,7 @@ namespace PurrNet.ConversionTool
                 {
                     folderAwareConverter.ScriptFolders = GetAssetPaths(scriptFolderAssets);
                     folderAwareConverter.PrefabFolders = GetAssetPaths(prefabFolderAssets);
+                    folderAwareConverter.SceneFolders = GetAssetPaths(sceneFolderAssets);
                 }
                 
                 var result = converter.ConvertFullProject();
@@ -306,6 +338,36 @@ namespace PurrNet.ConversionTool
             {
                 conversionLog = $"Error during code conversion: {ex.Message}";
                 ConversionLogger.LogChange($"Error during code conversion: {ex.Message}");
+            }
+        }
+        
+        private void ConvertScenes()
+        {
+            var converter = GetSelectedConverter();
+            if (converter == null)
+            {
+                conversionLog = "No converter selected.";
+                return;
+            }
+
+            try
+            {
+                ConversionLogger.LogChange($"Starting scene conversion with {converter.SystemName} converter");
+
+                if (converter is IFolderAwareConverter folderAware)
+                {
+                    folderAware.SceneFolders = GetAssetPaths(sceneFolderAssets);
+                }
+
+                var result = converter.ConvertScenes();
+                conversionLog = result.ToString();
+
+                ConversionLogger.LogChange($"Scene conversion completed with {(result.Success ? "success" : "errors")}");
+            }
+            catch (Exception ex)
+            {
+                conversionLog = $"Error during scene conversion: {ex.Message}";
+                ConversionLogger.LogChange($"Error during scene conversion: {ex.Message}");
             }
         }
         

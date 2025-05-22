@@ -5,7 +5,9 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using PurrNet.Logging;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace PurrNet.ConversionTool
@@ -14,14 +16,17 @@ namespace PurrNet.ConversionTool
     {
         private NetworkSystemMappings mappings;
         private NetworkPrefabHandling prefabHandler;
+        private NetworkSceneHandling sceneHandler;
         public List<string> ScriptFolders { get; set; } = new List<string>();
         
         public List<string> PrefabFolders { get; set; } = new List<string>();
-        
-        public GenericNetworkConverter(NetworkSystemMappings mappings, NetworkPrefabHandling prefabHandler)
+        public List<string> SceneFolders { get; set; } = new List<string>();
+
+        public GenericNetworkConverter(NetworkSystemMappings mappings, NetworkPrefabHandling prefabHandler, NetworkSceneHandling sceneHandler)
         {
             this.mappings = mappings;
             this.prefabHandler = prefabHandler;
+            this.sceneHandler = sceneHandler;
         }
 
         public string SystemName => mappings.SystemName;
@@ -661,6 +666,61 @@ namespace PurrNet.ConversionTool
                 EditorUtility.ClearProgressBar();
             }
 
+            return result;
+        }
+        
+        public ConversionResult ConvertScenes()
+        {
+            var result = new ConversionResult();
+            result.ConversionStats["scenes processed"] = 0;
+            result.ConversionStats["scenes converted"] = 0;
+            
+            string originalScene = EditorSceneManager.GetActiveScene().path;
+
+            List<string> sceneFolders = SceneFolders ?? new List<string> { "Assets" };
+            string[] sceneGuids = AssetDatabase.FindAssets("t:SceneAsset", sceneFolders.ToArray());
+            for (int i = 0; i < sceneGuids.Length; i++)
+            {
+                string scenePath = AssetDatabase.GUIDToAssetPath(sceneGuids[i]);
+                EditorUtility.DisplayProgressBar($"Converting {SystemName} Scenes", $"Processing {scenePath}", (float)i / sceneGuids.Length);
+
+                try
+                {
+                    var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                    bool converted = false;
+
+                    foreach (var rootObj in scene.GetRootGameObjects())
+                    {
+                        var allObjects = rootObj.GetComponentsInChildren<Transform>(true);
+                        foreach (var obj in allObjects)
+                        {
+                            if (!obj || !obj.gameObject)
+                                continue;
+                            if (sceneHandler.ConvertSceneObject(obj.gameObject))
+                                converted = true;
+                        }
+                    }
+
+                    if (converted)
+                    {
+                        EditorSceneManager.MarkSceneDirty(scene);
+                        EditorSceneManager.SaveScene(scene);
+                        result.ConversionStats["scenes converted"]++;
+                    }
+
+                    result.ConversionStats["scenes processed"]++;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    ConversionLogger.LogChange($"Scene conversion failed: {scenePath} - {ex.Message}");
+                }
+            }
+            
+            if (!string.IsNullOrEmpty(originalScene))
+                EditorSceneManager.OpenScene(originalScene, OpenSceneMode.Single);
+
+            EditorUtility.ClearProgressBar();
             return result;
         }
     }

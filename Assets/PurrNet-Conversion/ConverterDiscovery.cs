@@ -39,6 +39,7 @@ namespace PurrNet.ConversionTool
         {
             NetworkSystemMappings mappings = null;
             NetworkPrefabHandling prefabHandling = null;
+            NetworkSceneHandling sceneHandler = null;
             string[] scriptGuids = AssetDatabase.FindAssets("t:MonoScript", new[]{folderPath});
             foreach (string guid in scriptGuids)
             {
@@ -72,11 +73,22 @@ namespace PurrNet.ConversionTool
                     {
                     }
                 }
+                
+                if (typeof(NetworkSceneHandling).IsAssignableFrom(scriptType) && scriptType != typeof(NetworkSceneHandling))
+                {
+                    try
+                    {
+                        sceneHandler = (NetworkSceneHandling)Activator.CreateInstance(scriptType);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
             }
 
             if (mappings != null && prefabHandling != null && mappings.SystemName != "Generic")
             {
-                return new GenericNetworkConverter(mappings, prefabHandling);
+                return new GenericNetworkConverter(mappings, prefabHandling, sceneHandler);
             }
 
             return null;

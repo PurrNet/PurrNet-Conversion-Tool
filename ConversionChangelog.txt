@@ -1,0 +1,31 @@
+[2025-04-20 15:48:55] Starting code conversion with Test converter
+[2025-04-20 15:48:55] Code conversion completed with success
+[2025-04-20 15:55:46] Starting code conversion with FishNet converter
+[2025-04-20 15:55:46] Code conversion completed with success
+[2025-04-20 15:56:07] Starting code conversion with Test converter
+[2025-04-20 15:56:07] Modified: Test.cs (1 types converted)
+[2025-04-20 15:56:07] Code conversion completed with success
+[2025-05-22 16:52:47] Starting scene conversion with FishNet converter
+[2025-05-22 16:52:47] Error during scene conversion: Object reference not set to an instance of an object
+[2025-05-22 16:55:09] Starting scene conversion with FishNet converter
+[2025-05-22 16:55:09] Error during scene conversion: Object reference not set to an instance of an object
+[2025-05-22 16:56:30] Starting scene conversion with FishNet converter
+[2025-05-22 16:56:30] Scene conversion completed with success
+[2025-05-22 16:56:47] Starting scene conversion with FishNet converter
+[2025-05-22 16:56:47] Scene conversion completed with success
+[2025-05-22 16:58:50] Starting scene conversion with FishNet converter
+[2025-05-22 16:58:50] Scene conversion failed: Assets/Scenes/FishNet test scene.unity - Object reference not set to an instance of an object
+[2025-05-22 16:58:50] Scene conversion failed: Assets/Scenes/SampleScene.unity - Object reference not set to an instance of an object
+[2025-05-22 16:58:50] Scene conversion completed with success
+[2025-05-22 16:59:37] Starting scene conversion with FishNet converter
+[2025-05-22 16:59:37] Scene conversion failed: Assets/Scenes/FishNet test scene.unity - Object reference not set to an instance of an object
+[2025-05-22 16:59:37] Scene conversion failed: Assets/Scenes/SampleScene.unity - Object reference not set to an instance of an object
+[2025-05-22 16:59:37] Scene conversion completed with success
+[2025-05-22 17:00:26] Starting scene conversion with FishNet converter
+[2025-05-22 17:00:26] Scene conversion failed: Assets/Scenes/FishNet test scene.unity - Object reference not set to an instance of an object
+[2025-05-22 17:00:26] Scene conversion failed: Assets/Scenes/SampleScene.unity - Object reference not set to an instance of an object
+[2025-05-22 17:00:26] Scene conversion completed with success
+[2025-05-22 17:02:03] Starting scene conversion with FishNet converter
+[2025-05-22 17:02:03] Scene conversion completed with success
+[2025-05-22 17:05:24] Starting scene conversion with FishNet converter
+[2025-05-22 17:05:24] Scene conversion completed with success

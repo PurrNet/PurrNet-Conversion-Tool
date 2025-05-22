@@ -1,7 +1,10 @@
 {
     "name": "PurrNet.ConversionTool",
     "rootNamespace": "PurrNet.ConversionTool",
-    "references": [],
+    "references": [
+        "GUID:7c88a4a7926ee5145ad2dfa06f454c67",
+        "GUID:6e20f757a1bae164fa42750dd2b27dcb"
+    ],
     "includePlatforms": [
         "Editor"
     ],

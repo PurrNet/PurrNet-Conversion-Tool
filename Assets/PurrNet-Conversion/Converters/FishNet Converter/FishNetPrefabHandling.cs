@@ -43,7 +43,7 @@ public class FishNetPrefabHandling : NetworkPrefabHandling
         return edited;
     }
     
-    private void ConvertNetworkTransform(NetworkTransform nt)
+    public static void ConvertNetworkTransform(NetworkTransform nt)
     {
         var purrNa = nt.gameObject.AddComponent<PurrNet.NetworkTransform>();
         
@@ -84,12 +84,12 @@ public class FishNetPrefabHandling : NetworkPrefabHandling
         }
     }
     
-    private void ConvertNetworkAnimator(NetworkAnimator na)
+    public static void ConvertNetworkAnimator(NetworkAnimator na)
     {
         var purrNa = na.gameObject.AddComponent<PurrNet.NetworkAnimator>();
     }
 
-    private void CopyField(Type sourceType, object sourceObj, Type targetType, object targetObj, string sourceFieldName, string targetFieldName)
+    private static void CopyField(Type sourceType, object sourceObj, Type targetType, object targetObj, string sourceFieldName, string targetFieldName)
     {
         var sourceField = sourceType.GetField(sourceFieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var targetField = targetType.GetField(targetFieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
