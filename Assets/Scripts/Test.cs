@@ -1,4 +1,5 @@
 using System;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
@@ -41,6 +42,11 @@ public class Test : NetworkBehaviour
     {
         _syncVar.Value = myNumber;
         AllReceiveNumber(myNumber);
+
+        foreach (var client in NetworkManager.ClientManager.Clients)
+        {
+            TargetReceiveNumber(client.Value, myNumber);
+        }
     }
 
     [ObserversRpc(BufferLast = true)]
@@ -52,5 +58,11 @@ public class Test : NetworkBehaviour
     private void OnSyncChange(int prev, int next, bool asServer)
     {
         Debug.Log($"SyncVar just changed to {next} on {gameObject.name}");
+    }
+
+    [TargetRpc]
+    private void TargetReceiveNumber(NetworkConnection target, int number)
+    {
+        Debug.Log($"Received number: {number} as a target");
     }
 }
