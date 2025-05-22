@@ -130,7 +130,13 @@ namespace PurrNet.ConversionTool
             root = (CompilationUnitSyntax)ConvertMethodCalls(root, result);
             root = (CompilationUnitSyntax)mappings.SpecialCaseHandler(root, result);
             root = (CompilationUnitSyntax)ConvertUsingDirectives(root, result, requiredNamespaces);
-            File.WriteAllText(filePath, root.NormalizeWhitespace().ToFullString());
+            var formattedCode = root
+                .WithLeadingTrivia(tree.GetRoot().GetLeadingTrivia())
+                .NormalizeWhitespace()
+                .ToFullString();
+
+            File.WriteAllText(filePath, formattedCode);
+
             
             if (!code.Equals(root.NormalizeWhitespace().ToFullString()))
             {

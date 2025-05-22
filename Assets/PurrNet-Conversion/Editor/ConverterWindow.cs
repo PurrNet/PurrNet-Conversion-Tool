@@ -25,9 +25,9 @@ namespace PurrNet.ConversionTool
         private ReorderableList prefabFoldersList;
         private ReorderableList sceneFoldersList;
         
-        private bool showScriptFolders = true;
-        private bool showPrefabFolders = true;
-        private bool showSceneFolders = true;
+        private bool showScriptFolders;
+        private bool showPrefabFolders;
+        private bool showSceneFolders;
 
         [MenuItem("Tools/PurrNet/Conversion Tool")]
         public static void ShowWindow()
