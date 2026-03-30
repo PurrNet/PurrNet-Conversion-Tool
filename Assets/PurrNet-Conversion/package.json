@@ -1,0 +1,20 @@
+{
+  "name": "dev.purrnet.conversiontool",
+  "version": "1.0.0",
+  "author": {
+    "name": "PurrNet Team",
+    "url": "https://purrnet.dev/"
+  },
+  "description": "A recipe-based conversion tool for migrating networking projects to PurrNet. Supports FishNet conversion out of the box.",
+  "displayName": "PurrNet Conversion Tool",
+  "documentationUrl": "https://purrnet.gitbook.io/",
+  "hideInEditor": false,
+  "keywords": [
+    "purrnet",
+    "networking",
+    "multiplayer",
+    "conversion",
+    "migration",
+    "fishnet"
+  ]
+}
