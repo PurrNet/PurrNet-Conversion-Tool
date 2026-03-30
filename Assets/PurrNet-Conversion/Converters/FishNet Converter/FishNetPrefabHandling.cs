@@ -1,4 +1,3 @@
-using PurrNet.ConversionTool;
 using UnityEngine;
 
 #if FISHNET
@@ -7,8 +6,11 @@ using FishNet.Component.Animating;
 using FishNet.Component.Transforming;
 using FishNet.Object;
 #endif
-public class FishNetPrefabHandling : NetworkPrefabHandling
+
+namespace PurrNet.ConversionTool
 {
+    public class FishNetPrefabHandling : NetworkPrefabHandling
+    {
 #if FISHNET
     public override bool ConvertPrefab(GameObject prefab)
     {
@@ -101,4 +103,5 @@ public class FishNetPrefabHandling : NetworkPrefabHandling
         }
     }
 #endif
+    }
 }

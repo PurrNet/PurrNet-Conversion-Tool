@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using PurrNet.Transports;
 using UnityEngine;
 
 #if FISHNET
@@ -17,7 +18,6 @@ using FishNet.Managing.Transporting;
 using FishNet.Transporting.Multipass;
 using FishNet.Transporting.Tugboat;
 using FishNet.Transporting.Yak;
-using PurrNet.Transports;
 #endif
 
 namespace PurrNet.ConversionTool

@@ -1,7 +1,11 @@
 {
-    "name": "PurrNet.ConversionTool",
+    "name": "PurrNet.ConversionTool.FishNet",
     "rootNamespace": "PurrNet.ConversionTool",
-    "references": [],
+    "references": [
+        "GUID:0f988d1c531e79845a0ac3bb310edcea",
+        "GUID:7c88a4a7926ee5145ad2dfa06f454c67",
+        "GUID:6e20f757a1bae164fa42750dd2b27dcb"
+    ],
     "includePlatforms": [
         "Editor"
     ],
@@ -10,7 +14,9 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
+    "defineConstraints": [
+        "FISHNET"
+    ],
     "versionDefines": [],
     "noEngineReferences": false
 }

@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using PurrNet.Logging;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -30,25 +29,6 @@ namespace PurrNet.ConversionTool
         }
 
         public string SystemName => mappings.SystemName;
-        public ConversionResult ConvertFullProject()
-        {
-            var codeResult = ConvertCode();
-            if (!codeResult.Success)
-                return codeResult;
-            var prefabResult = ConvertPrefabs();
-            // Merge results
-            codeResult.ConversionStats.ToList().ForEach(x =>
-            {
-                if (prefabResult.ConversionStats.ContainsKey(x.Key))
-                    prefabResult.ConversionStats[x.Key] += x.Value;
-                else
-                    prefabResult.ConversionStats[x.Key] = x.Value;
-            }
-
-            );
-            prefabResult.Success &= codeResult.Success;
-            return prefabResult;
-        }
 
         public ConversionResult ConvertCode()
         {

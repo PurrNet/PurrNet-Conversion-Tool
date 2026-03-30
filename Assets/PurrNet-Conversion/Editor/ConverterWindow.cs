@@ -201,19 +201,14 @@ namespace PurrNet.ConversionTool
 
             EditorGUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("Convert Full Project", GUILayout.Height(30)))
+            if (GUILayout.Button("Convert Code", GUILayout.Height(30)))
             {
-                ConvertFullProject();
+                ConvertCode();
             }
 
             if (GUILayout.Button("Convert Prefabs", GUILayout.Height(30)))
             {
                 ConvertPrefabs();
-            }
-
-            if (GUILayout.Button("Convert Code", GUILayout.Height(30)))
-            {
-                ConvertCode();
             }
             
             if (GUILayout.Button("Convert Scenes", GUILayout.Height(30)))
@@ -247,38 +242,6 @@ namespace PurrNet.ConversionTool
             }
             
             return availableConverters[selectedNetworkingSystem].Converter;
-        }
-
-        private void ConvertFullProject()
-        {
-            var converter = GetSelectedConverter();
-            if (converter == null)
-            {
-                conversionLog = "No converter selected.";
-                return;
-            }
-
-            try
-            {
-                ConversionLogger.LogChange($"Starting full project conversion with {converter.SystemName} converter");
-                
-                if (converter is IFolderAwareConverter folderAwareConverter)
-                {
-                    folderAwareConverter.ScriptFolders = GetAssetPaths(scriptFolderAssets);
-                    folderAwareConverter.PrefabFolders = GetAssetPaths(prefabFolderAssets);
-                    folderAwareConverter.SceneFolders = GetAssetPaths(sceneFolderAssets);
-                }
-                
-                var result = converter.ConvertFullProject();
-                conversionLog = result.ToString();
-                
-                ConversionLogger.LogChange($"Full project conversion completed with {(result.Success ? "success" : "errors")}");
-            }
-            catch (Exception ex)
-            {
-                conversionLog = $"Error during conversion: {ex.Message}";
-                ConversionLogger.LogChange($"Error during full project conversion: {ex.Message}");
-            }
         }
 
         private void ConvertPrefabs()
