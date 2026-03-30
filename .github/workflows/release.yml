@@ -8,12 +8,18 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     strategy:
       matrix:
         node-version: [ 18.x ]
     steps:
       # Step 1: Checkout the code
       - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       # Step 2: Setup Node.js
       - name: Use Node.js ${{ matrix.node-version }}
@@ -33,7 +39,7 @@ jobs:
       - name: Run Semantic Release
         id: release
         run: |
-          npx semantic-release > output.log || true
+          npx semantic-release 2>&1 | tee output.log || true
           if grep -q "Publishing version" output.log; then
             echo "new-release=true" >> $GITHUB_ENV
             VERSION=$(grep "Publishing version" output.log | sed -n 's/.*Publishing version \(.*\)$/\1/p')
