@@ -2,9 +2,6 @@ using UnityEngine;
 
 #if FISHNET
 using System;
-using FishNet.Component.Animating;
-using FishNet.Component.Transforming;
-using FishNet.Object;
 #endif
 
 namespace PurrNet.ConversionTool
@@ -15,9 +12,9 @@ namespace PurrNet.ConversionTool
     public override bool ConvertPrefab(GameObject prefab)
     {
         bool edited = false;
-        var networkTransform = prefab.GetComponentsInChildren<NetworkTransform>();
-        var networkAnimators = prefab.GetComponentsInChildren<NetworkAnimator>();
-        var networkObjects = prefab.GetComponentsInChildren<NetworkObject>();
+        var networkTransform = prefab.GetComponentsInChildren<FishNet.Component.Transforming.NetworkTransform>();
+        var networkAnimators = prefab.GetComponentsInChildren<FishNet.Component.Animating.NetworkAnimator>();
+        var networkObjects = prefab.GetComponentsInChildren<FishNet.Object.NetworkObject>();
 
         for (var i = 0; i < networkTransform.Length; i++)
         {
@@ -45,7 +42,7 @@ namespace PurrNet.ConversionTool
         return edited;
     }
     
-    public static void ConvertNetworkTransform(NetworkTransform nt)
+    public static void ConvertNetworkTransform(FishNet.Component.Transforming.NetworkTransform nt)
     {
         var purrNa = nt.gameObject.AddComponent<PurrNet.NetworkTransform>();
         
@@ -86,7 +83,7 @@ namespace PurrNet.ConversionTool
         }
     }
     
-    public static void ConvertNetworkAnimator(NetworkAnimator na)
+    public static void ConvertNetworkAnimator(FishNet.Component.Animating.NetworkAnimator na)
     {
         var purrNa = na.gameObject.AddComponent<PurrNet.NetworkAnimator>();
     }
